@@ -6,7 +6,7 @@ library(doSNOW)
 
 setwd('C:/Users/moroncog/Documents/GitHub/SimulationSamplingObservers/Code')
 # Number of replicates
-nSim = 10
+nSim = 20
 
 cores = detectCores()
 cl = makeCluster(cores[1] - 3)
@@ -20,6 +20,7 @@ foreach(ix = 1:nSim) %dopar% {
   require(geosphere)
   require(tidyr)
   require(ggplot2)
+  require(gridExtra)
 
 	# parameters for the simulation:
 	source('1_parameters.R', local = TRUE)

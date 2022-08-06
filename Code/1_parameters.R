@@ -38,20 +38,25 @@ areaSwept = 0.1 # per set, in km2
 nVessels = 100
 timeUnits = 1 # in days
 nTUnitsSeason = 180
+full_H = 0.7
 nTimesTravelArea = 4 # number of time units to travel to the fishing area
 mean_holdCapacity = 20
 max_nTimesTrip = 25
 radiusTrip = 20 # in nautical miles
+sigmaM = 1 # for simulated catches. For lognormal catch
+
+### Selectivity-at-length
 beta1 = 55 # selectivity parameter 1
 beta2 = 2 # selectivity parameter 2
-sigmaM = 1 # for simulated catches. For lognormal catch
+allLens = seq(from = minLen, to = maxLen, by = lenBin)
+selexAtLength = 1/(1 + exp(-log(19)*(allLens-beta1)/beta2)) 
 
 # Observer scenarios:
 
-nObservers = 11 # number of vessels with cameras
+nObservers = seq(from = 1, to = 10, by = 1) # number of vessels with cameras
 precisionScenarios = data.frame(name = c('Low', 'Medium', 'High'),
 						   		len = c(5, 3, 1),
-						   		sex = c(0.8, 0.9, 1))
+						   		sex = c(80, 90, 100))
 nFishSampled = c(250, 200, 150, 100, 50)
 
 

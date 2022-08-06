@@ -7,18 +7,10 @@ allLens = seq(from = minLen, to = maxLen, by = lenBin)
 nLens = length(allLens)
 propSex = c(femFrac, 1-femFrac)
 
-# Selectivity-at-length:
-SelecFish = 1/(1 + exp(-log(19)*(allLens-beta1)/beta2)) 
-
 # Growth model:
 Lminp = minLen - lenBin*0.5 
 bpar = (L1_par - Lminp)/A1_par
 a_new = maxAge:(2*maxAge)
-
-# Grid area:
-gridSizeKm = gridSize * 111 # this is grid size in km
-GridArea = gridSizeKm*gridSizeKm # in km2
-
 
 # Simulation --------------------------------------------------------------
 
@@ -38,8 +30,7 @@ for(i in 1:2) {
 
   	# Create inital length for all ages:
   	iniLens_tmp = ifelse((allAges+beginFish) <= A1_par, Lminp + (bpar*(allAges+beginFish)), 
-  	                 		Linf[i]+(L1_par-Linf[i])*exp(-(K_par[i])*((allAges+beginFish) - A1_par)))
-  	iniLens_tmp[length(iniLens_tmp)] = sum(exp(-0.2*(a_new - maxAge))*(iniLens_tmp[length(iniLens_tmp)] + ((a_new - maxAge)/maxAge)*(Linf[i]-iniLens_tmp[length(iniLens_tmp)])))/sum(exp(-0.2*(a_new-maxAge)))
+  	                 		Linf[i]+(L1_par[i]-Linf[i])*exp(-(K_par[i])*((allAges+beginFish) - A1_par)))
   	iniLens[i,] = iniLens_tmp
 
   	sdLen[i,] = SD1[i] + ((iniLens[i,] - L1_par[i])/(Linf[i] - L1_par[i]))*(SD2[i]-SD1[i])
@@ -57,6 +48,9 @@ for(t in 1:nTUnitsSeason) {
 	# Calculate length at the middle of the time step:
 	LensMid = iniLens + (iniLens-Linf)*(exp(-multT*(K_par)) - 1)
 
+	# Calculate sd length:
+	sdLen = SD1 + ((LensMid - L1_par)/(Linf - L1_par))*(SD2-SD1)
+	
 	# Calculate transition matrix:
   	for(s in 1:2) {
 	  	for(i in 1:nLens){
@@ -87,8 +81,8 @@ for(t in 1:nTUnitsSeason) {
 	  	}
 	}
 
-  SelecFishAge[t, 1,] = colSums(sweep(AgeLenMatrixProp[t,1,,], MARGIN=1, SelecFish, `*`)) # females
-  SelecFishAge[t, 2,] = colSums(sweep(AgeLenMatrixProp[t,2,,], MARGIN=1, SelecFish, `*`)) # males
+  SelecFishAge[t, 1,] = colSums(sweep(AgeLenMatrixProp[t,1,,], MARGIN=1, selexAtLength, `*`)) # females
+  SelecFishAge[t, 2,] = colSums(sweep(AgeLenMatrixProp[t,2,,], MARGIN=1, selexAtLength, `*`)) # males
 
 	# Numbers-at-age:
 	Z_par = M_par + (F_par*SelecFishAge[t,,])
@@ -130,7 +124,7 @@ for(k in 1:nVessels) {
     }
 		if(countTripTimes > nTimesTravelArea & countTripTimes < (max_nTimesTrip - nTimesTravelArea)) {
 
-				if(totCatch < 0.7*holdCapacity) {
+				if(totCatch < full_H*holdCapacity) {
 
 					if(countSet == 1) {
 						selGrid = sample(x = rownames(saveOmega), size = 1, prob = saveOmega$prob)
@@ -151,7 +145,7 @@ for(k in 1:nVessels) {
 					numbersGenderLenGrid = matrix(NA, nrow = 2, ncol = nLens)
 					numbersGenderLenGrid[1, ] = rowSums(sweep(AgeLenMatrixProp[t,1,,], MARGIN=2, numbersGenderGrid[1,], `*`)) # females
 					numbersGenderLenGrid[2, ] = rowSums(sweep(AgeLenMatrixProp[t,2,,], MARGIN=2, numbersGenderGrid[2,], `*`)) # males
-					selNumbersGenderLenGrid =	sweep(numbersGenderLenGrid, MARGIN=2, SelecFish, `*`)
+					selNumbersGenderLenGrid =	sweep(numbersGenderLenGrid, MARGIN=2, selexAtLength, `*`)
 					
 					pL = 1 - exp(-areaSwept*selNumbersGenderLenGrid)
 					pLsim = structure(vapply(pL, rbinom, numeric(1), n = 1, size = 1), dim=dim(pL))
@@ -173,6 +167,7 @@ for(k in 1:nVessels) {
 					saveCatchSet$trip = countTrip
 					saveCatchSet$lon = this_lon
 					saveCatchSet$lat = this_lat
+					saveCatchSet$iteration = ix
 					tempData = tidyr::gather(saveCatchSet, 'gender', 'n', 1:2)
 					tempData$gender2 = ifelse(test = tempData$gender == 'female', yes = 0, no = 1)
 					saveInformation[[countList]] = tempData
@@ -202,6 +197,13 @@ trueLenComp = allData %>%
 trueLenComp2 = trueLenComp %>% 
   dplyr::group_by(gender2) %>% 
   dplyr::mutate(comps = n/sum(n))
+
+setLocations = allData %>%
+            group_by(trip, set, vessel, iteration) %>%
+            summarise(lon = unique(lon), lat = unique(lat), .groups = 'drop')
+
+write.csv(setLocations, file.path(folder_outputs, paste0('setLocationsAll_', ix, '.csv')))
+
 
 if(ix == 1){
   
