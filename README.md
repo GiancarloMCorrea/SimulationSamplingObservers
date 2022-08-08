@@ -15,3 +15,31 @@ There are six main R files in this repository:
 
 Feel free to modify any part of this repository to apply it to specific case studies. 
 
+The most important file is `1_parameters.R`, which contains the parameters for this simulation framework. It is divided in four sections:
+
+Simulation parameters
+---------------------
+
+### Population model
+
+-   `maxAge`: age plus grop.
+-   `minAge`: minimum age. Should always be 0.
+-   `maxLen`: maximum length (cm)
+-   `minLen`: minimum length (cm)
+-   `lenBin`: length bin size (cm)
+-   `meanRec`: mean recruitment (number of fish)
+-   `sigmaR`: variability of recruitment
+-   `femFrac`: fraction of females in the population
+-   `A1_par`: reference age
+-   `Linf`: asymptotic length (cm)
+-   `K_par`: growth rate (1/year)
+-   `M_par`: natural mortality (1/year)
+-   `L1_par`: mean length at age `A1_par`
+-   `SD1`: standard deviation of lengths at `minAge`
+-   `SD2`: standard deviation of lengths at `maxAge`
+-   `par_a`: parameter length-weight relationship
+-   `par_b`: parameter length-weight relationship
+
+
+
+
