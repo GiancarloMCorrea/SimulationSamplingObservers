@@ -1,7 +1,7 @@
 # Simulation framework: Collected data by onboard observers
 
 This is the code used in Correa et al. (XXXX) to evaluate the impacts 
-of onboard observers sampling strategies on collected data. This code 
+of onboard observers sampling strategies on collected data. This code (folder *Code*) 
 can be applied to any stock and fishery worldwide. 
 
 There are six main R files in this repository:
@@ -15,7 +15,7 @@ There are six main R files in this repository:
 
 Feel free to modify any part of this repository to apply it to specific case studies. 
 
-The most important file is `1_parameters.R`, which contains the parameters for this simulation framework. It is divided in four sections:
+The most important file is `1_parameters.R`, which contains the parameters for this simulation framework.
 
 Simulation parameters
 ---------------------
