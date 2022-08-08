@@ -19,7 +19,7 @@ SD2 = c(15, 15) # Standard deviations of lengths at age plus group (females, mal
 par_a = c(3.67e-05, 1.28e-05)
 par_b = c(2.62, 2.89)
 
-# Spatial model
+# Spatial field
 
 gridSize = 0.05 # gridSize is a fraction of a grade (e.g. 0.05 = 0.05*1 grade = 0.05*60nm = 3 mn)
 SpatialScale = 0.5 # st value = 0.5
@@ -51,7 +51,7 @@ beta2 = 2 # selectivity parameter 2
 allLens = seq(from = minLen, to = maxLen, by = lenBin)
 selexAtLength = 1/(1 + exp(-log(19)*(allLens-beta1)/beta2)) 
 
-# Observer scenarios:
+# Observer scenarios
 
 nObservers = seq(from = 1, to = 10, by = 1) # number of vessels with cameras
 precisionScenarios = data.frame(name = c('Low', 'Medium', 'High'),
